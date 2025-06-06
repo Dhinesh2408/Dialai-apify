@@ -17,7 +17,7 @@ public class ApifiService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${apify.token}")
+    @Value("${apify.api.token}")
     private String apifyToken;
 
     public ApifiService(WebClient.Builder webClientBuilder) {

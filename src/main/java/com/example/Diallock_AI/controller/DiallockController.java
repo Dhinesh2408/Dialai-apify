@@ -47,16 +47,21 @@ public class DiallockController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
-    // Login
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
+        if (user.getPassword() == null || user.getEmail() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email and password must be provided"));
+        }
+
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent() && passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
             String token = JwtUtil.generateToken(String.valueOf(existingUser.get().getId()));
             return ResponseEntity.ok(Map.of("message", "Login successful", "token", token));
         }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
     }
+
 
     @GetMapping("/{campaignid}/{id}/read")
     public ResponseEntity<?> readMailForLead(@PathVariable int campaignid, @PathVariable int id) {

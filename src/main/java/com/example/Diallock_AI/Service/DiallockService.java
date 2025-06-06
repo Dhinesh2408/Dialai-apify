@@ -54,7 +54,7 @@ public class DiallockService {
 	private campaigntablerepo tablerepo;
 	
 	@Autowired
-	private  ApifiService firecrawl;
+	private ApifiService apifiService;
 	
 	@Autowired
 	private GenAiService aiservice;
@@ -156,7 +156,7 @@ public class DiallockService {
 			if (lead == null) continue;
 
 			String name = lead.getName();
-			String scrapedContent = firecrawl.crawlUrl(leadUrl).block();
+			String scrapedContent = apifiService.crawlUrl(leadUrl).block();
 			String summary = aiservice.generateResponseFromContent(scrapedContent);
 			String emailContent = aiservice.generateResponse(summary, request.getPrompt(), name, userId);
 

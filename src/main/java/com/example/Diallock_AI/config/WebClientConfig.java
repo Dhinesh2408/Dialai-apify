@@ -12,11 +12,12 @@ public class WebClientConfig {
     private String apifyApiToken;
 
 
-    @Bean
-    WebClient apifyWebClient(WebClient.Builder builder) {
-        return builder
-            .baseUrl("https://api.apify.com/v2")
-            .defaultHeader("Authorization", "Bearer " + apifyApiToken)
-            .build();
-    }
+   @Bean
+   public WebClient apifyWebClient(WebClient.Builder builder) {
+       return builder
+           .baseUrl("https://api.apify.com/v2")
+           .defaultHeader("Authorization", "Bearer " + apifyApiToken)
+           .build();
+   }
+
 }
