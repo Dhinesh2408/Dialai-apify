@@ -44,9 +44,9 @@ public class Campaigntable {
     private LocalDate startDate;
     
     @Enumerated(EnumType.STRING)
-    private FollowUpPlan followUpPlan;
+    private followUpPlan followUpPlan;
 
-    public Campaigntable(String campaignName, String prompt, CampaignStatus status, FollowUpPlan followupplan) {
+    public Campaigntable(String campaignName, String prompt, CampaignStatus status, followUpPlan followupplan) {
         this.campaignname = campaignName;
         this.status = status;
         this.prompt = prompt;

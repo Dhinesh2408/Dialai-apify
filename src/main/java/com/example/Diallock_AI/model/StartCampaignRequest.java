@@ -15,11 +15,11 @@ public class StartCampaignRequest {
     private List<Integer> leadIds;
     private String prompt;
     private List<String> url;
-    private FollowUpPlan followupplan;
+    private followUpPlan followupplan;
     private LocalDate createdDate;
 
     public StartCampaignRequest(String campaignName, List<Integer> leadIds, String prompt,
-                                List<String> url, FollowUpPlan followupplan) {
+                                List<String> url, followUpPlan followupplan) {
         this.campaignName = campaignName;
         this.leadIds = leadIds;
         this.prompt = prompt;

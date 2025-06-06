@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.Diallock_AI.model.FollowUpPlan;
+import com.example.Diallock_AI.model.followUpPlan;
 
 public class FollowUpScheduler {
 
-    public static List<LocalDate> getFollowUpDates(LocalDate startDate, FollowUpPlan plan) {
+    public static List<LocalDate> getFollowUpDates(LocalDate startDate, followUpPlan plan) {
         List<Integer> offsets = plan.getDayOffsets();
         List<LocalDate> scheduledDates = new ArrayList<>();
 

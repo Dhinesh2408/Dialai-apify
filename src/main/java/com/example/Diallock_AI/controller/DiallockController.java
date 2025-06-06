@@ -89,8 +89,9 @@ public class DiallockController {
         int userId = getCurrentUserId();
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        Setting saved = settingService.saveSetting(setting, userOpt.get());
-        return ResponseEntity.ok(saved);
+
+        Setting savedSetting = settingService.saveSetting(setting, userOpt.get());
+        return ResponseEntity.ok(savedSetting);
     }
 
     @GetMapping("/getsetting")
@@ -157,29 +158,55 @@ public class DiallockController {
     }
 
     @PostMapping("/campaign/start")
-    public ResponseEntity<?> startCampaign(@RequestParam("campaignName") String campaignName,
-                                           @RequestParam("prompt") String prompt,
-                                           @RequestParam("file") MultipartFile file,
-                                           @RequestParam String Followupplan) {
+    public ResponseEntity<?> startCampaign(
+        @RequestParam("campaignName") String campaignName,
+        @RequestParam("prompt") String prompt,
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("followUpPlan") String followUpPlan) {
+
         int userId = getCurrentUserId();
         Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found or unauthorized");
+        }
+
+        if (campaignName == null || campaignName.isBlank()) {
+            return ResponseEntity.badRequest().body("Campaign name must be provided.");
+        }
+
+        if (prompt == null || prompt.isBlank()) {
+            return ResponseEntity.badRequest().body("Prompt must be provided.");
+        }
+
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("CSV file is required.");
+        }
+
         try {
-            if (file.isEmpty()) return ResponseEntity.badRequest().body("CSV file is required.");
-
             List<DiallockModel> savedLeads = csvservice.saveUsersFromCSV(file, userOpt.get());
-            if (savedLeads == null || savedLeads.isEmpty())
-                return ResponseEntity.badRequest().body("No valid leads found in CSV.");
 
-            FollowUpPlan plan = FollowUpPlan.valueOf(Followupplan.toUpperCase());
+            if (savedLeads == null || savedLeads.isEmpty()) {
+                return ResponseEntity.badRequest().body("No valid leads found in CSV.");
+            }
+
+            String plan;
+            try {
+                plan = followUpPlan.valueOf(followUpPlan.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body("Invalid follow-up plan: " + followUpPlan);
+            }
 
             List<Integer> leadIds = savedLeads.stream().map(DiallockModel::getId).collect(Collectors.toList());
             List<String> urls = savedLeads.stream().map(DiallockModel::getUrl).collect(Collectors.toList());
 
             service.startCampaign(new StartCampaignRequest(campaignName, leadIds, prompt, urls, plan), userId);
+
             return ResponseEntity.ok("Campaign started with " + savedLeads.size() + " leads.");
+
         } catch (CsvValidationException e) {
             return ResponseEntity.badRequest().body("CSV Validation Error: " + e.getMessage());
         } catch (Exception e) {
+            // Optional: log the error here
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
